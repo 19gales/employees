@@ -5,13 +5,12 @@ import {
   updateUser,
   useGetUserStatus
 } from '../../store/reducers/user-slice';
-import {Button, Checkbox, DatePicker, Form, Input, message, Select, Space} from 'antd';
+import {Button, Checkbox, Form, message, Space} from 'antd';
 import Title from 'antd/lib/typography/Title';
 import {MessageType} from 'antd/es/message';
-import {MaskedInput} from 'antd-mask-input';
 import {Link, useNavigate} from 'react-router-dom';
-import moment from 'moment';
 import {IUser} from '../../models/interfaces';
+import { InputName, InputPhone, RoleSelect, UserBDPicker } from '../../ui';
 
 type UseFormProps = {
   userById?: IUser,
@@ -26,7 +25,6 @@ const UserForm: FC<UseFormProps> = ({userById}) => {
   const [valueRole, setValueRole] = useState(userById!.role);
   const [valueData, setValueData] = useState(userById!.birthday || '');
 
-  const dateFormat = 'DD.MM.YYYY';
   const navigate = useNavigate();
   const isUserStatusAdd = statusUser === 'add';
 
@@ -36,6 +34,12 @@ const UserForm: FC<UseFormProps> = ({userById}) => {
   const handleSelect = (valueRole: string) => {
     setValueRole(valueRole);
   };
+  const handleName = (valueName: string) => {
+    setValueName(valueName);
+  };
+  const handlePhone = (valuePhone: string) => {
+    setValuePhone(valuePhone);
+  };
   const handleData = (dateString: string) => {
     setValueData(dateString);
   };
@@ -44,7 +48,7 @@ const UserForm: FC<UseFormProps> = ({userById}) => {
     if (
       valueName.trim() === ''
         || valuePhone.trim() === ''
-        || valueRole.trim() === ''
+        ||valueRole.trim() === ''
         || valueData.trim() === ''
     ) {
       return message.error('Пожалуста заполните все поля со *');
@@ -52,9 +56,8 @@ const UserForm: FC<UseFormProps> = ({userById}) => {
     
     isUserStatusAdd ? dispatch(addUser(userUpdate)) : dispatch(updateUser(userUpdate));
 
-    navigate(-1);
+    navigate('/');
   };
-
 
   const userCreate = () => {
     const newUser: IUser = {
@@ -84,31 +87,15 @@ const UserForm: FC<UseFormProps> = ({userById}) => {
         }}
         layout='horizontal'
         colon={false}
-      > <Form.Item  label='Имя Фамилия' name="name" rules={[
+      > <Form.Item  label='Имя Фамилия' name="name" wrapperCol={{
+          span: 3,
+        }} rules={[
           {
             required: true,
             message: 'Пожалуйста введите имя и фамилию!',
           },
         ]}>
-          <Input defaultValue={valueName} onChange={
-            (e: React.FormEvent<HTMLInputElement>): void =>
-            {
-              setValueName(e.currentTarget.value);
-              e.currentTarget.value = '';
-            }}/>
-        </Form.Item>
-        <Form.Item
-          label="Телефон"
-          name="phone"
-          rules={[{required: true,}]}
-        >
-          <MaskedInput
-            defaultValue={valuePhone}
-            mask={'+7(000) 000-0000'}
-            onChange ={(e: React.FormEvent<HTMLInputElement>): void =>{
-              setValuePhone(e.currentTarget.value);
-              e.currentTarget.value = '';
-            }}/>
+          <InputName name={valueName} onChange={handleName} />
         </Form.Item>
         <Form.Item label='Должность' name='role' wrapperCol={{
           span: 3,
@@ -117,12 +104,17 @@ const UserForm: FC<UseFormProps> = ({userById}) => {
             required: true,
             message: 'Пожалуйста введите должность',
           },
-        ]}>
-          <Select defaultValue={valueRole} onChange={handleSelect}>
-            <Select.Option value="cook" >Повар</Select.Option>
-            <Select.Option value="driver">Водитель</Select.Option>
-            <Select.Option value="waiter">Официант</Select.Option>
-          </Select>
+        ]}><RoleSelect role={valueRole} onChange={handleSelect}/>
+        </Form.Item>
+        <Form.Item
+          label="Телефон"
+          name="phone"
+          rules={[{
+            required: true,
+            message: 'Пожалуйста введите телефон',
+          }]}
+        >
+          <InputPhone phone={valuePhone} onChange={handlePhone} />
         </Form.Item>
         <Form.Item label='Дата рождения'  name='birthday' wrapperCol={{
           span: 5,
@@ -131,14 +123,7 @@ const UserForm: FC<UseFormProps> = ({userById}) => {
             required: true,
             message: 'Пожалуйста введите дату рождения!',
           },
-        ]}>
-          <DatePicker
-            showTime={true}
-            defaultValue={valueData ? moment(valueData, dateFormat) : undefined}
-            format={dateFormat} 
-            onChange={(data, dateString) => {
-              handleData(dateString);
-            }}/>
+        ]}><UserBDPicker data={valueData} onChange={handleData}/>
         </Form.Item>
         <Form.Item label='В архиве' wrapperCol={{
           span: 4,

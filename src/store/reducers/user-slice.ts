@@ -7,15 +7,15 @@ import {RootState} from '../store';
 export interface UserState {
   entities: IUser[];
   editUser: IUser[];
-  status: 'loading' | 'succeeded' | 'failed';
-  userStatus: 'add' | 'edit' | ''
+  status: 'loading' | 'succeeded' | 'failed' ;
+  userStatus: 'add' | 'edit' | '' ;
 }
 
 const initialState: UserState = {
   entities: [],
   editUser: [],
-  userStatus: '',
   status: 'loading',
+  userStatus: '',
 };
 
 export const userSlice = createSlice({

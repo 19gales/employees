@@ -16,8 +16,9 @@ import {Link} from 'react-router-dom';
 import {ColumnsType} from 'antd/es/table';
 import {IUserTable} from '../../models/interfaces';
 import {uniSort} from '../../utils/filter-users-by-name';
+import moment from 'moment';
 
-const UsersTable: FC = ():JSX.Element => {
+const UsersTable: FC = () => {
   const dispatch = useAppDispatch();
   const userData: IUserTable[] = useGetById();
   const status: string = useGetStatus();
@@ -110,8 +111,10 @@ const UsersTable: FC = ():JSX.Element => {
       title: 'Дата',
       dataIndex: 'birthday',
       align:'center',
-      sorter: (a, b) => 
-        uniSort(String(a.birthday), String(b.birthday)),
+      sorter: ((a, b) => {
+        return moment(a.birthday, 'DD.MM.YYYY') > moment(b.birthday, 'DD.MM.YYYY') ? 1
+          : moment(a.birthday, 'DD.MM.YYYY') < moment(b.birthday, 'DD.MM.YYYY') ? -1 : 0;
+      }),
       showSorterTooltip: false,
     },
     {
